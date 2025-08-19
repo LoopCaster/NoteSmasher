@@ -52,5 +52,38 @@ export class NotesStore {
 		if (today > fromISO) return today; // even if no content on today
 		return null;
 	}
+
+	getAllNotes(): Record<string, Record<string, string>> {
+		const allNotes: Record<string, Record<string, string>> = {};
+		
+		// Get all localStorage keys that match our pattern
+		for (let i = 0; i < localStorage.length; i++) {
+			const key = localStorage.key(i);
+			if (key && key.startsWith('notesmasher.notes.')) {
+				const jobId = key.replace('notesmasher.notes.', '');
+				const map = this.loadMap(jobId);
+				if (Object.keys(map).length > 0) {
+					allNotes[jobId] = map;
+				}
+			}
+		}
+		
+		return allNotes;
+	}
+
+	importNotes(notes: Record<string, Record<string, string>>): void {
+		// Clear existing notes
+		for (let i = localStorage.length - 1; i >= 0; i--) {
+			const key = localStorage.key(i);
+			if (key && key.startsWith('notesmasher.notes.')) {
+				localStorage.removeItem(key);
+			}
+		}
+
+		// Import new notes
+		Object.entries(notes).forEach(([jobId, jobNotes]) => {
+			this.saveMap(jobId, jobNotes);
+		});
+	}
 }
 

@@ -5,10 +5,12 @@ import { TaskList } from './TaskList';
 import { TaskDetail } from './TaskDetail';
 import { ResizeHandle } from './ResizeHandle';
 import { VerticalResizeHandle } from './VerticalResizeHandle';
+import { SyncPanel } from './SyncPanel';
 import { getTodayISO, toISODate } from '../utils/dateUtils';
 import { NotesStore } from '../utils/notesStore';
 import { TaskStore } from '../utils/taskStore';
 import { Task } from '../utils/taskStore';
+import { GistStorage, GistData } from '../utils/gistStorage';
 
 export type JobId = string;
 
@@ -44,6 +46,7 @@ export const App: React.FC = () => {
 
 	const store = useMemo(() => new NotesStore(), []);
 	const taskStore = useMemo(() => new TaskStore(), []);
+	const gistStorage = useMemo(() => new GistStorage(), []);
 
 	function addJob() {
 		const name = prompt('New job name');
@@ -113,6 +116,31 @@ export const App: React.FC = () => {
 		});
 	}
 
+	function exportData(): GistData {
+		return {
+			jobs: jobs,
+			notes: store.getAllNotes(),
+			tasks: taskStore.getAllTasks()
+		};
+	}
+
+	function importData(data: GistData) {
+		// Import jobs
+		if (data.jobs && Array.isArray(data.jobs)) {
+			setJobs(data.jobs);
+		}
+
+		// Import notes
+		if (data.notes) {
+			store.importNotes(data.notes);
+		}
+
+		// Import tasks
+		if (data.tasks) {
+			taskStore.importTasks(data.tasks);
+		}
+	}
+
 	return (
 		<div className="container">
 			<div style={{ 
@@ -127,7 +155,7 @@ export const App: React.FC = () => {
 				zIndex: 1000,
 				fontFamily: 'monospace'
 			}}>
-				v1.6.0
+				v1.7.0
 			</div>
 			<aside className="sidebar">
 				<h3 className="title">Jobs</h3>
@@ -203,6 +231,11 @@ export const App: React.FC = () => {
 					</div>
 				</div>
 			</main>
+			<SyncPanel 
+				gistStorage={gistStorage}
+				onSync={importData}
+				onExport={exportData}
+			/>
 		</div>
 	);
 };

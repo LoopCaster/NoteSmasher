@@ -83,4 +83,37 @@ export class TaskStore {
 	getPendingTasks(jobId: JobId): Task[] {
 		return this.loadTasks(jobId).filter(t => !t.completed);
 	}
+
+	getAllTasks(): Record<string, Task[]> {
+		const allTasks: Record<string, Task[]> = {};
+		
+		// Get all localStorage keys that match our pattern
+		for (let i = 0; i < localStorage.length; i++) {
+			const key = localStorage.key(i);
+			if (key && key.startsWith('notesmasher.tasks.')) {
+				const jobId = key.replace('notesmasher.tasks.', '');
+				const tasks = this.loadTasks(jobId);
+				if (tasks.length > 0) {
+					allTasks[jobId] = tasks;
+				}
+			}
+		}
+		
+		return allTasks;
+	}
+
+	importTasks(tasks: Record<string, Task[]>): void {
+		// Clear existing tasks
+		for (let i = localStorage.length - 1; i >= 0; i--) {
+			const key = localStorage.key(i);
+			if (key && key.startsWith('notesmasher.tasks.')) {
+				localStorage.removeItem(key);
+			}
+		}
+
+		// Import new tasks
+		Object.entries(tasks).forEach(([jobId, jobTasks]) => {
+			this.saveTasks(jobId, jobTasks);
+		});
+	}
 }
