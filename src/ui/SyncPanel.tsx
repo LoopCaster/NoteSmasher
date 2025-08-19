@@ -13,6 +13,8 @@ export const SyncPanel: React.FC<Props> = ({ gistStorage, onSync, onExport }) =>
 	const [isConnected, setIsConnected] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState('');
+	const [gistId, setGistId] = useState('');
+	const [showGistIdInput, setShowGistIdInput] = useState(false);
 
 	useEffect(() => {
 		checkConnection();
@@ -23,6 +25,7 @@ export const SyncPanel: React.FC<Props> = ({ gistStorage, onSync, onExport }) =>
 		setIsConnected(connected);
 		if (connected) {
 			setToken(gistStorage.getToken() || '');
+			setGistId(gistStorage.getGistId() || '');
 		}
 	};
 
@@ -106,7 +109,16 @@ export const SyncPanel: React.FC<Props> = ({ gistStorage, onSync, onExport }) =>
 		gistStorage.clearAuth();
 		setIsConnected(false);
 		setToken('');
+		setGistId('');
 		setMessage('Disconnected from GitHub');
+	};
+
+	const handleSetGistId = () => {
+		if (gistId.trim()) {
+			gistStorage.setGistId(gistId.trim());
+			setShowGistIdInput(false);
+			setMessage('Gist ID set successfully');
+		}
 	};
 
 	return (
@@ -186,6 +198,12 @@ export const SyncPanel: React.FC<Props> = ({ gistStorage, onSync, onExport }) =>
 									✓ Connected to GitHub
 								</p>
 
+								{gistId && (
+									<div style={{ marginBottom: 16, padding: 8, background: 'rgba(124,156,255,0.1)', borderRadius: 4 }}>
+										<small style={{ color: 'var(--muted)' }}>Gist ID: {gistId}</small>
+									</div>
+								)}
+
 								<div className="toolbar" style={{ marginBottom: 16 }}>
 									<button 
 										className="button" 
@@ -203,7 +221,13 @@ export const SyncPanel: React.FC<Props> = ({ gistStorage, onSync, onExport }) =>
 									</button>
 								</div>
 
-								<div className="toolbar">
+								<div className="toolbar" style={{ marginBottom: 16 }}>
+									<button 
+										className="button ghost" 
+										onClick={() => setShowGistIdInput(!showGistIdInput)}
+									>
+										{showGistIdInput ? 'Cancel' : 'Set Gist ID'}
+									</button>
 									<button 
 										className="button ghost" 
 										onClick={handleDisconnect}
@@ -211,6 +235,30 @@ export const SyncPanel: React.FC<Props> = ({ gistStorage, onSync, onExport }) =>
 										Disconnect
 									</button>
 								</div>
+
+								{showGistIdInput && (
+									<div style={{ marginBottom: 16 }}>
+										<label style={{ display: 'block', marginBottom: 8, color: 'var(--muted)' }}>
+											Gist ID (from the other computer):
+										</label>
+										<div style={{ display: 'flex', gap: 8 }}>
+											<input
+												type="text"
+												value={gistId}
+												onChange={(e) => setGistId(e.target.value)}
+												className="jobs-input"
+												placeholder="1234567890abcdef..."
+												style={{ flex: 1 }}
+											/>
+											<button 
+												className="button" 
+												onClick={handleSetGistId}
+											>
+												Set
+											</button>
+										</div>
+									</div>
+								)}
 							</div>
 						)}
 

@@ -155,7 +155,7 @@ export const App: React.FC = () => {
 				zIndex: 1000,
 				fontFamily: 'monospace'
 			}}>
-				v1.7.0
+				v1.8.0
 			</div>
 			<aside className="sidebar">
 				<h3 className="title">Jobs</h3>
