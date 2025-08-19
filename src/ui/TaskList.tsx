@@ -4,9 +4,10 @@ import { TaskStore, Task } from '../utils/taskStore';
 interface Props {
 	taskStore: TaskStore;
 	jobId: string;
+	onTaskSelect: (task: Task) => void;
 }
 
-export const TaskList: React.FC<Props> = ({ taskStore, jobId }) => {
+export const TaskList: React.FC<Props> = ({ taskStore, jobId, onTaskSelect }) => {
 	const [tasks, setTasks] = useState<Task[]>([]);
 	const [newTaskTitle, setNewTaskTitle] = useState('');
 	const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export const TaskList: React.FC<Props> = ({ taskStore, jobId }) => {
 
 	const addTask = () => {
 		if (newTaskTitle.trim()) {
-			taskStore.addTask(jobId, newTaskTitle);
+			taskStore.addTask(jobId, newTaskTitle, '');
 			setTasks(taskStore.getTasks(jobId));
 			setNewTaskTitle('');
 		}
@@ -36,10 +37,13 @@ export const TaskList: React.FC<Props> = ({ taskStore, jobId }) => {
 
 	const saveEdit = () => {
 		if (editingTaskId && editingTitle.trim()) {
-			taskStore.updateTask(jobId, editingTaskId, editingTitle);
-			setTasks(taskStore.getTasks(jobId));
-			setEditingTaskId(null);
-			setEditingTitle('');
+			const task = tasks.find(t => t.id === editingTaskId);
+			if (task) {
+				taskStore.updateTask(jobId, editingTaskId, editingTitle, task.description);
+				setTasks(taskStore.getTasks(jobId));
+				setEditingTaskId(null);
+				setEditingTitle('');
+			}
 		}
 	};
 
@@ -118,7 +122,12 @@ export const TaskList: React.FC<Props> = ({ taskStore, jobId }) => {
 									</>
 								) : (
 									<>
-										<span style={{ flex: 1, fontSize: 14 }}>{task.title}</span>
+										<span 
+											style={{ flex: 1, fontSize: 14, cursor: 'pointer' }}
+											onClick={() => onTaskSelect(task)}
+										>
+											{task.title}
+										</span>
 										<button className="button ghost" onClick={() => startEditing(task)}>Edit</button>
 										<button className="button ghost" onClick={() => deleteTask(task.id)}>Delete</button>
 									</>
@@ -151,12 +160,18 @@ export const TaskList: React.FC<Props> = ({ taskStore, jobId }) => {
 									onChange={() => toggleTask(task.id)}
 									style={{ margin: 0 }}
 								/>
-								<span style={{ 
-									flex: 1, 
-									fontSize: 14, 
-									textDecoration: 'line-through',
-									color: 'var(--muted)'
-								}}>{task.title}</span>
+								<span 
+									style={{ 
+										flex: 1, 
+										fontSize: 14, 
+										textDecoration: 'line-through',
+										color: 'var(--muted)',
+										cursor: 'pointer'
+									}}
+									onClick={() => onTaskSelect(task)}
+								>
+									{task.title}
+								</span>
 								<button className="button ghost" onClick={() => deleteTask(task.id)}>Delete</button>
 							</div>
 						))}

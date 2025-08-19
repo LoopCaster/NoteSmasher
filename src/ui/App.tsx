@@ -2,9 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { DailyNotes } from './DailyNotes';
 import { MonthCalendar } from './MonthCalendar';
 import { TaskList } from './TaskList';
+import { TaskDetail } from './TaskDetail';
 import { getTodayISO, toISODate } from '../utils/dateUtils';
 import { NotesStore } from '../utils/notesStore';
 import { TaskStore } from '../utils/taskStore';
+import { Task } from '../utils/taskStore';
 
 export type JobId = string;
 
@@ -20,6 +22,7 @@ export const App: React.FC = () => {
 	});
 	const [selectedJob, setSelectedJob] = useState<JobId>(jobs[0] ?? 'Job');
 	const [selectedDateISO, setSelectedDateISO] = useState<string>(getTodayISO());
+	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
 	useEffect(() => {
 		localStorage.setItem('notesmasher.jobs', JSON.stringify(jobs));
@@ -60,6 +63,24 @@ export const App: React.FC = () => {
 		if (next) setSelectedDateISO(next);
 	}
 
+	function handleTaskSelect(task: Task) {
+		setSelectedTask(task);
+	}
+
+	function handleTaskSave(taskId: string, title: string, description: string) {
+		taskStore.updateTask(selectedJob, taskId, title, description);
+		setSelectedTask(null);
+	}
+
+	function handleTaskToggle(taskId: string) {
+		taskStore.toggleTask(selectedJob, taskId);
+	}
+
+	function handleTaskDelete(taskId: string) {
+		taskStore.deleteTask(selectedJob, taskId);
+		setSelectedTask(null);
+	}
+
 	return (
 		<div className="container">
 			<aside className="sidebar">
@@ -94,13 +115,24 @@ export const App: React.FC = () => {
 			</header>
 
 			<main className="main">
-				<section className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-					<DailyNotes
-						store={store}
-						jobId={selectedJob}
-						dateISO={selectedDateISO}
-						onChangeDate={setSelectedDateISO}
-					/>
+				<section style={{ display: 'flex', flexDirection: 'column' }}>
+					<div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+						<DailyNotes
+							store={store}
+							jobId={selectedJob}
+							dateISO={selectedDateISO}
+							onChangeDate={setSelectedDateISO}
+						/>
+					</div>
+					{selectedTask && (
+						<TaskDetail
+							task={selectedTask}
+							onClose={() => setSelectedTask(null)}
+							onSave={handleTaskSave}
+							onToggle={handleTaskToggle}
+							onDelete={handleTaskDelete}
+						/>
+					)}
 				</section>
 				<aside className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 					<MonthCalendar
@@ -112,6 +144,7 @@ export const App: React.FC = () => {
 					<TaskList
 						taskStore={taskStore}
 						jobId={selectedJob}
+						onTaskSelect={handleTaskSelect}
 					/>
 				</aside>
 			</main>

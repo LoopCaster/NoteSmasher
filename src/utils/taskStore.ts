@@ -1,6 +1,7 @@
 export interface Task {
 	id: string;
 	title: string;
+	description: string;
 	completed: boolean;
 	createdAt: string;
 	completedAt?: string;
@@ -27,11 +28,12 @@ export class TaskStore {
 		return this.loadTasks(jobId);
 	}
 
-	addTask(jobId: JobId, title: string): Task {
+	addTask(jobId: JobId, title: string, description: string = ''): Task {
 		const tasks = this.loadTasks(jobId);
 		const newTask: Task = {
 			id: Date.now().toString(),
 			title: title.trim(),
+			description: description.trim(),
 			completed: false,
 			createdAt: new Date().toISOString()
 		};
@@ -50,11 +52,12 @@ export class TaskStore {
 		}
 	}
 
-	updateTask(jobId: JobId, taskId: string, title: string): void {
+	updateTask(jobId: JobId, taskId: string, title: string, description: string): void {
 		const tasks = this.loadTasks(jobId);
 		const task = tasks.find(t => t.id === taskId);
 		if (task) {
 			task.title = title.trim();
+			task.description = description.trim();
 			this.saveTasks(jobId, tasks);
 		}
 	}
