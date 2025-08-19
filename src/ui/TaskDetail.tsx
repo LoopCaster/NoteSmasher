@@ -47,7 +47,7 @@ export const TaskDetail: React.FC<Props> = ({ task, onClose, onSave, onToggle, o
 	};
 
 	return (
-		<div className="card" style={{ marginTop: 12 }}>
+		<div className="card" style={{ marginTop: 12, height: '100%', display: 'flex', flexDirection: 'column' }}>
 			<div className="toolbar" style={{ marginBottom: 12 }}>
 				<strong>Task Details</strong>
 				<span className="spacer" />
@@ -94,14 +94,14 @@ export const TaskDetail: React.FC<Props> = ({ task, onClose, onSave, onToggle, o
 			</div>
 
 			{/* Task description */}
-			<div style={{ marginBottom: 16 }}>
+			<div style={{ marginBottom: 16, flex: 1, display: 'flex', flexDirection: 'column' }}>
 				<div style={{ marginBottom: 8, color: 'var(--muted)', fontSize: 14 }}>Description:</div>
 				{isEditing ? (
 					<textarea
 						value={editDescription}
 						onChange={(e) => setEditDescription(e.target.value)}
 						className="note-editor"
-						style={{ height: 120, fontSize: 14 }}
+						style={{ flex: 1, fontSize: 14, minHeight: 120 }}
 						placeholder="Add task description..."
 					/>
 				) : (
@@ -110,8 +110,10 @@ export const TaskDetail: React.FC<Props> = ({ task, onClose, onSave, onToggle, o
 						lineHeight: 1.5,
 						color: task.completed ? 'var(--muted)' : 'var(--text)',
 						textDecoration: task.completed ? 'line-through' : 'none',
+						flex: 1,
 						minHeight: 60,
-						padding: '8px 0'
+						padding: '8px 0',
+						overflow: 'auto'
 					}}>
 						{task.description || 'No description'}
 					</div>

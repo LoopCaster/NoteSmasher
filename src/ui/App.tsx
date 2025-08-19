@@ -27,6 +27,7 @@ export const App: React.FC = () => {
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 	const [rightPanelWidth, setRightPanelWidth] = useState(320);
 	const [dailyNotesHeight, setDailyNotesHeight] = useState(400);
+	const [taskDetailHeight, setTaskDetailHeight] = useState(300);
 
 	useEffect(() => {
 		localStorage.setItem('notesmasher.jobs', JSON.stringify(jobs));
@@ -105,6 +106,13 @@ export const App: React.FC = () => {
 		});
 	}
 
+	function handleTaskDetailResize(deltaY: number) {
+		setTaskDetailHeight(prev => {
+			const newHeight = prev + deltaY;
+			return Math.max(150, Math.min(600, newHeight)); // Min 150px, Max 600px
+		});
+	}
+
 	return (
 		<div className="container">
 			<div style={{ 
@@ -119,7 +127,7 @@ export const App: React.FC = () => {
 				zIndex: 1000,
 				fontFamily: 'monospace'
 			}}>
-				v1.5.0
+				v1.6.0
 			</div>
 			<aside className="sidebar">
 				<h3 className="title">Jobs</h3>
@@ -165,13 +173,16 @@ export const App: React.FC = () => {
 					{selectedTask && (
 						<>
 							<VerticalResizeHandle onResize={handleVerticalResize} />
-							<TaskDetail
-								task={selectedTask}
-								onClose={() => setSelectedTask(null)}
-								onSave={handleTaskSave}
-								onToggle={handleTaskToggle}
-								onDelete={handleTaskDelete}
-							/>
+							<div style={{ height: taskDetailHeight }}>
+								<TaskDetail
+									task={selectedTask}
+									onClose={() => setSelectedTask(null)}
+									onSave={handleTaskSave}
+									onToggle={handleTaskToggle}
+									onDelete={handleTaskDelete}
+								/>
+							</div>
+							<VerticalResizeHandle onResize={handleTaskDetailResize} />
 						</>
 					)}
 				</div>
