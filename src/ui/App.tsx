@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { DailyNotes } from './DailyNotes';
-import { MonthCalendar } from './MonthCalendar';
+import { TaskList } from './TaskList';
 import { getTodayISO, toISODate } from '../utils/dateUtils';
 import { NotesStore } from '../utils/notesStore';
+import { TaskStore } from '../utils/taskStore';
 
 export type JobId = string;
 
@@ -33,6 +34,7 @@ export const App: React.FC = () => {
 	}, [selectedJob, jobs]);
 
 	const store = useMemo(() => new NotesStore(), []);
+	const taskStore = useMemo(() => new TaskStore(), []);
 
 	function addJob() {
 		const name = prompt('New job name');
@@ -100,11 +102,9 @@ export const App: React.FC = () => {
 					/>
 				</section>
 				<aside className="card">
-					<MonthCalendar
-						store={store}
+					<TaskList
+						taskStore={taskStore}
 						jobId={selectedJob}
-						selectedDateISO={selectedDateISO}
-						onSelectDate={setSelectedDateISO}
 					/>
 				</aside>
 			</main>
