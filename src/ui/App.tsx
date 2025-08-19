@@ -83,6 +83,20 @@ export const App: React.FC = () => {
 
 	return (
 		<div className="container">
+			<div style={{ 
+				position: 'fixed', 
+				top: 8, 
+				left: 8, 
+				background: 'rgba(0,0,0,0.7)', 
+				color: 'var(--muted)', 
+				padding: '4px 8px', 
+				borderRadius: 4, 
+				fontSize: 11, 
+				zIndex: 1000,
+				fontFamily: 'monospace'
+			}}>
+				v1.2.0
+			</div>
 			<aside className="sidebar">
 				<h3 className="title">Jobs</h3>
 				<div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
