@@ -19,7 +19,7 @@ export const TaskList: React.FC<Props> = ({ taskStore, jobId, onTaskSelect }) =>
 
 	const addTask = () => {
 		if (newTaskTitle.trim()) {
-			taskStore.addTask(jobId, newTaskTitle, '');
+			taskStore.addTask(jobId, newTaskTitle, '', undefined);
 			setTasks(taskStore.getTasks(jobId));
 			setNewTaskTitle('');
 		}
@@ -39,7 +39,7 @@ export const TaskList: React.FC<Props> = ({ taskStore, jobId, onTaskSelect }) =>
 		if (editingTaskId && editingTitle.trim()) {
 			const task = tasks.find(t => t.id === editingTaskId);
 			if (task) {
-				taskStore.updateTask(jobId, editingTaskId, editingTitle, task.description);
+				taskStore.updateTask(jobId, editingTaskId, editingTitle, task.description, task.deadline);
 				setTasks(taskStore.getTasks(jobId));
 				setEditingTaskId(null);
 				setEditingTitle('');

@@ -71,9 +71,13 @@ export const App: React.FC = () => {
 		setSelectedTask(task);
 	}
 
-	function handleTaskSave(taskId: string, title: string, description: string) {
-		taskStore.updateTask(selectedJob, taskId, title, description);
-		setSelectedTask(null);
+	function handleTaskSave(taskId: string, title: string, description: string, deadline?: string) {
+		taskStore.updateTask(selectedJob, taskId, title, description, deadline);
+		// Update the selectedTask state with the new data
+		const updatedTask = taskStore.getTask(selectedJob, taskId);
+		if (updatedTask) {
+			setSelectedTask(updatedTask);
+		}
 	}
 
 	function handleTaskToggle(taskId: string) {
@@ -115,7 +119,7 @@ export const App: React.FC = () => {
 				zIndex: 1000,
 				fontFamily: 'monospace'
 			}}>
-				v1.4.0
+				v1.5.0
 			</div>
 			<aside className="sidebar">
 				<h3 className="title">Jobs</h3>

@@ -5,7 +5,7 @@ import { getHumanDate } from '../utils/dateUtils';
 interface Props {
 	task: Task | null;
 	onClose: () => void;
-	onSave: (taskId: string, title: string, description: string) => void;
+	onSave: (taskId: string, title: string, description: string, deadline?: string) => void;
 	onToggle: (taskId: string) => void;
 	onDelete: (taskId: string) => void;
 }
@@ -14,24 +14,29 @@ export const TaskDetail: React.FC<Props> = ({ task, onClose, onSave, onToggle, o
 	const [isEditing, setIsEditing] = useState(false);
 	const [editTitle, setEditTitle] = useState('');
 	const [editDescription, setEditDescription] = useState('');
+	const [editDeadline, setEditDeadline] = useState('');
 
 	if (!task) return null;
 
 	const handleEdit = () => {
 		setEditTitle(task.title);
 		setEditDescription(task.description);
+		setEditDeadline(task.deadline || '');
 		setIsEditing(true);
 	};
 
 	const handleSave = () => {
 		if (editTitle.trim()) {
-			onSave(task.id, editTitle, editDescription);
+			onSave(task.id, editTitle, editDescription, editDeadline || undefined);
 			setIsEditing(false);
 		}
 	};
 
 	const handleCancel = () => {
 		setIsEditing(false);
+		setEditTitle('');
+		setEditDescription('');
+		setEditDeadline('');
 	};
 
 	const handleDelete = () => {
@@ -78,6 +83,9 @@ export const TaskDetail: React.FC<Props> = ({ task, onClose, onSave, onToggle, o
 					)}
 					<div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
 						Created: {getHumanDate(task.createdAt.split('T')[0])}
+						{task.deadline && (
+							<span> • Deadline: {getHumanDate(task.deadline.split('T')[0])}</span>
+						)}
 						{task.completedAt && (
 							<span> • Completed: {getHumanDate(task.completedAt.split('T')[0])}</span>
 						)}
@@ -106,6 +114,29 @@ export const TaskDetail: React.FC<Props> = ({ task, onClose, onSave, onToggle, o
 						padding: '8px 0'
 					}}>
 						{task.description || 'No description'}
+					</div>
+				)}
+			</div>
+
+			{/* Task deadline */}
+			<div style={{ marginBottom: 16 }}>
+				<div style={{ marginBottom: 8, color: 'var(--muted)', fontSize: 14 }}>Deadline:</div>
+				{isEditing ? (
+					<input
+						type="date"
+						value={editDeadline}
+						onChange={(e) => setEditDeadline(e.target.value)}
+						className="jobs-input"
+						style={{ fontSize: 14 }}
+					/>
+				) : (
+					<div style={{ 
+						fontSize: 14,
+						color: task.completed ? 'var(--muted)' : 'var(--text)',
+						textDecoration: task.completed ? 'line-through' : 'none',
+						padding: '8px 0'
+					}}>
+						{task.deadline ? getHumanDate(task.deadline.split('T')[0]) : 'No deadline set'}
 					</div>
 				)}
 			</div>

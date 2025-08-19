@@ -5,6 +5,7 @@ export interface Task {
 	completed: boolean;
 	createdAt: string;
 	completedAt?: string;
+	deadline?: string;
 }
 
 type JobId = string;
@@ -28,14 +29,15 @@ export class TaskStore {
 		return this.loadTasks(jobId);
 	}
 
-	addTask(jobId: JobId, title: string, description: string = ''): Task {
+	addTask(jobId: JobId, title: string, description: string = '', deadline?: string): Task {
 		const tasks = this.loadTasks(jobId);
 		const newTask: Task = {
 			id: Date.now().toString(),
 			title: title.trim(),
 			description: description.trim(),
 			completed: false,
-			createdAt: new Date().toISOString()
+			createdAt: new Date().toISOString(),
+			deadline: deadline
 		};
 		tasks.push(newTask);
 		this.saveTasks(jobId, tasks);
@@ -52,14 +54,20 @@ export class TaskStore {
 		}
 	}
 
-	updateTask(jobId: JobId, taskId: string, title: string, description: string): void {
+	updateTask(jobId: JobId, taskId: string, title: string, description: string, deadline?: string): void {
 		const tasks = this.loadTasks(jobId);
 		const task = tasks.find(t => t.id === taskId);
 		if (task) {
 			task.title = title.trim();
 			task.description = description.trim();
+			task.deadline = deadline;
 			this.saveTasks(jobId, tasks);
 		}
+	}
+
+	getTask(jobId: JobId, taskId: string): Task | undefined {
+		const tasks = this.loadTasks(jobId);
+		return tasks.find(t => t.id === taskId);
 	}
 
 	deleteTask(jobId: JobId, taskId: string): void {
