@@ -3,6 +3,8 @@ import { DailyNotes } from './DailyNotes';
 import { MonthCalendar } from './MonthCalendar';
 import { TaskList } from './TaskList';
 import { TaskDetail } from './TaskDetail';
+import { ResizeHandle } from './ResizeHandle';
+import { VerticalResizeHandle } from './VerticalResizeHandle';
 import { getTodayISO, toISODate } from '../utils/dateUtils';
 import { NotesStore } from '../utils/notesStore';
 import { TaskStore } from '../utils/taskStore';
@@ -23,6 +25,8 @@ export const App: React.FC = () => {
 	const [selectedJob, setSelectedJob] = useState<JobId>(jobs[0] ?? 'Job');
 	const [selectedDateISO, setSelectedDateISO] = useState<string>(getTodayISO());
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+	const [rightPanelWidth, setRightPanelWidth] = useState(320);
+	const [dailyNotesHeight, setDailyNotesHeight] = useState(400);
 
 	useEffect(() => {
 		localStorage.setItem('notesmasher.jobs', JSON.stringify(jobs));
@@ -79,6 +83,22 @@ export const App: React.FC = () => {
 	function handleTaskDelete(taskId: string) {
 		taskStore.deleteTask(selectedJob, taskId);
 		setSelectedTask(null);
+		// Force re-render of task list by updating a state
+		setRightPanelWidth(prev => prev); // This triggers a re-render
+	}
+
+	function handleResize(deltaX: number) {
+		setRightPanelWidth(prev => {
+			const newWidth = prev - deltaX;
+			return Math.max(280, Math.min(600, newWidth)); // Min 280px, Max 600px
+		});
+	}
+
+	function handleVerticalResize(deltaY: number) {
+		setDailyNotesHeight(prev => {
+			const newHeight = prev + deltaY;
+			return Math.max(200, Math.min(800, newHeight)); // Min 200px, Max 800px
+		});
 	}
 
 	return (
@@ -95,7 +115,7 @@ export const App: React.FC = () => {
 				zIndex: 1000,
 				fontFamily: 'monospace'
 			}}>
-				v1.2.0
+				v1.4.0
 			</div>
 			<aside className="sidebar">
 				<h3 className="title">Jobs</h3>
@@ -129,8 +149,8 @@ export const App: React.FC = () => {
 			</header>
 
 			<main className="main">
-				<section style={{ display: 'flex', flexDirection: 'column' }}>
-					<div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+				<div className="main-left">
+					<div className="card" style={{ display: 'flex', flexDirection: 'column', height: dailyNotesHeight }}>
 						<DailyNotes
 							store={store}
 							jobId={selectedJob}
@@ -139,28 +159,34 @@ export const App: React.FC = () => {
 						/>
 					</div>
 					{selectedTask && (
-						<TaskDetail
-							task={selectedTask}
-							onClose={() => setSelectedTask(null)}
-							onSave={handleTaskSave}
-							onToggle={handleTaskToggle}
-							onDelete={handleTaskDelete}
-						/>
+						<>
+							<VerticalResizeHandle onResize={handleVerticalResize} />
+							<TaskDetail
+								task={selectedTask}
+								onClose={() => setSelectedTask(null)}
+								onSave={handleTaskSave}
+								onToggle={handleTaskToggle}
+								onDelete={handleTaskDelete}
+							/>
+						</>
 					)}
-				</section>
-				<aside className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-					<MonthCalendar
-						store={store}
-						jobId={selectedJob}
-						selectedDateISO={selectedDateISO}
-						onSelectDate={setSelectedDateISO}
-					/>
-					<TaskList
-						taskStore={taskStore}
-						jobId={selectedJob}
-						onTaskSelect={handleTaskSelect}
-					/>
-				</aside>
+				</div>
+				<ResizeHandle onResize={handleResize} />
+				<div className="main-right" style={{ width: rightPanelWidth }}>
+					<div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+						<MonthCalendar
+							store={store}
+							jobId={selectedJob}
+							selectedDateISO={selectedDateISO}
+							onSelectDate={setSelectedDateISO}
+						/>
+						<TaskList
+							taskStore={taskStore}
+							jobId={selectedJob}
+							onTaskSelect={handleTaskSelect}
+						/>
+					</div>
+				</div>
 			</main>
 		</div>
 	);

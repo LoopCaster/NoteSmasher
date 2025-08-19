@@ -47,10 +47,78 @@ body {
 
 .main {
 	grid-area: main;
-	display: grid;
-	grid-template-columns: 1fr 320px;
+	display: flex;
 	gap: 12px;
 	padding: 12px;
+	height: calc(100vh - 60px);
+}
+
+.main-left {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 300px;
+}
+
+.main-right {
+	width: 320px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 280px;
+}
+
+.resize-handle {
+	width: 6px;
+	background: var(--border);
+	cursor: col-resize;
+	transition: background 0.2s;
+	position: relative;
+	margin: 0 2px;
+}
+
+.resize-handle:hover,
+.resize-handle.dragging {
+	background: var(--accent);
+}
+
+.resize-handle::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 2px;
+	height: 20px;
+	background: var(--muted);
+	border-radius: 1px;
+}
+
+.vertical-resize-handle {
+	height: 6px;
+	background: var(--border);
+	cursor: row-resize;
+	transition: background 0.2s;
+	position: relative;
+	margin: 2px 0;
+}
+
+.vertical-resize-handle:hover,
+.vertical-resize-handle.dragging {
+	background: var(--accent);
+}
+
+.vertical-resize-handle::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	height: 2px;
+	width: 20px;
+	background: var(--muted);
+	border-radius: 1px;
 }
 
 .card {
