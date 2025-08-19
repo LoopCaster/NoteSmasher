@@ -59,7 +59,7 @@ export const TaskList: React.FC<Props> = ({ taskStore, jobId }) => {
 	const completedTasks = tasks.filter(t => t.completed);
 
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+		<div style={{ display: 'flex', flexDirection: 'column' }}>
 			<div className="toolbar" style={{ marginBottom: 8 }}>
 				<strong>Tasks for {jobId}</strong>
 			</div>

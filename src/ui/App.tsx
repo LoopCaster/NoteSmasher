@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { DailyNotes } from './DailyNotes';
+import { MonthCalendar } from './MonthCalendar';
 import { TaskList } from './TaskList';
 import { getTodayISO, toISODate } from '../utils/dateUtils';
 import { NotesStore } from '../utils/notesStore';
@@ -101,7 +102,13 @@ export const App: React.FC = () => {
 						onChangeDate={setSelectedDateISO}
 					/>
 				</section>
-				<aside className="card">
+				<aside className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+					<MonthCalendar
+						store={store}
+						jobId={selectedJob}
+						selectedDateISO={selectedDateISO}
+						onSelectDate={setSelectedDateISO}
+					/>
 					<TaskList
 						taskStore={taskStore}
 						jobId={selectedJob}
